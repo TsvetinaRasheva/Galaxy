@@ -1,4 +1,4 @@
-#include "Jedi.hpp"
+#include "Jedi.h"
 
 JediRank JediRankType(char* input)
 {
@@ -41,7 +41,18 @@ JediRank JediRankType(char* input)
 
 }
 
+//Func
+void Jedi::clear()
+{
+	delete[] name;
+	name = nullptr;
+	delete[] spicies;
+	spicies = nullptr;
+	delete[] militaryRank;
+	militaryRank = nullptr;
+}
 
+//Constructors
 Jedi::Jedi()
 {
 	this->name = nullptr;
@@ -119,16 +130,20 @@ Jedi::Jedi(const Jedi& entity)
 	
 }
 
+Jedi::~Jedi()
+{
+	clear();
+}
+
+//Operators
 Jedi& Jedi::operator=(const Jedi& entity)
 {
 	if (this != &entity)
 	{
-		delete[] name;
-		//this->rank = RankOfJedi::Null;
+		clear();
+		this->rank = JediRank::Unnone;
 		this->midi_chlorian = 0.0;
 		planet.~Planet();
-		delete[] spicies;
-		delete[] militaryRank;
 
 		*this = Jedi(entity);
 
@@ -232,13 +247,5 @@ std::istream& operator>>(std::istream& in, Jedi& entity)
 
 }
 
-Jedi::~Jedi()
-{
-	delete[] name;
-	name = nullptr;
-	delete[] spicies;
-	spicies = nullptr;
-	delete[] militaryRank;
-	militaryRank = nullptr;
-}
+
 

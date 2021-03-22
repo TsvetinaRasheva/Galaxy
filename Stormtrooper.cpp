@@ -1,4 +1,4 @@
-#include "Stormtrooper.hpp"
+#include "Stormtrooper.h"
 
 StormtrooperRank stormtrooperRankType(char* input)
 {
@@ -36,6 +36,17 @@ StormtrooperRank stormtrooperRankType(char* input)
 	}
 }
 
+//Func
+void Stormtrooper::clear()
+{
+	delete[] id;
+	id = nullptr;
+	delete[] type;
+	type = nullptr;
+}
+
+
+//Constructors
 Stormtrooper::Stormtrooper()
 {
 	this->id = nullptr;
@@ -78,13 +89,19 @@ Stormtrooper::Stormtrooper(const Stormtrooper& entity)
 
 }
 
+Stormtrooper::~Stormtrooper()
+{
+	clear();
+}
+
+
+//Operators
 Stormtrooper& Stormtrooper::operator=(const Stormtrooper& entity)
 {
 	if (this != &entity)
 	{
-		delete[] id;
+		clear();
 		this->rank = StormtrooperRank::Undefine;
-		delete[] type;
 		planet.~Planet();
 
 		if (entity.get_id() != nullptr)
@@ -119,7 +136,10 @@ Stormtrooper& Stormtrooper::operator=(const Stormtrooper& entity)
 
 bool Stormtrooper::operator==(const Stormtrooper& entity) const
 {
-	return strcmp(this->get_id(), entity.get_id()) && this->get_rank() == entity.get_rank() && strcmp(this->get_type(), entity.get_type()) && this->planet == entity.planet;
+	return !strcmp(this->get_id(), entity.get_id()) 
+		&& this->get_rank() == entity.get_rank() 
+		&& !strcmp(this->get_type(), entity.get_type()) 
+		&& this->planet == entity.planet;
 }
 
 bool Stormtrooper::operator!=(const Stormtrooper& entity) const
@@ -160,7 +180,7 @@ std::istream& operator>>(std::istream& in, Stormtrooper& entity)
 	delete[] temp;
 	temp = nullptr;
 
-	///to do...
+
 	std::cout << "Rank: ";
 	temp = new char[100];
 	in.getline(temp, 100);
@@ -192,10 +212,4 @@ std::istream& operator>>(std::istream& in, Stormtrooper& entity)
 	return in;
 }
 
-Stormtrooper::~Stormtrooper()
-{
-	delete[] id;
-	id = nullptr;
-	delete[] type;
-	type = nullptr;
-}
+
