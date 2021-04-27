@@ -1,8 +1,9 @@
-#include "Stormtrooper.hpp"
+#include "Stormtrooper.h"
+#include <cstring>
 
 StormtrooperRank stormtrooperRankType(char* input)
 {
-	toLower(input);
+	toLowerCase(input);
 
 	std::string str(input);
 
@@ -36,6 +37,50 @@ StormtrooperRank stormtrooperRankType(char* input)
 	}
 }
 
+void Stormtrooper::copy(const Stormtrooper& entity) {
+	copyId(entity.get_id());
+	this->rank = entity.rank;
+	copyType(entity.get_type());
+	this->planet = entity.planet;
+}
+
+//Func
+void Stormtrooper::clear()
+{
+	delete[] id;
+	id = nullptr;
+	delete[] type;
+	type = nullptr;
+}
+void Stormtrooper::copyId(const char* source) {
+	if (source != nullptr)
+	{
+		delete[] this->id;
+
+		size_t size = strlen(source);
+		this->id = new char[size+1];
+		strcpy_s(this->id, size+1, source);
+	}
+	else
+	{
+		this->id = nullptr;
+	}
+}
+void Stormtrooper::copyType(const char* source) {
+	if (source != nullptr)
+	{
+		delete[] this->type;
+		size_t size = strlen(source);
+		this->type = new char[size+1];
+		strcpy_s(this->type, size+1, source);
+	}
+	else
+	{
+		this->type = nullptr;
+	}
+}
+
+//Constructors
 Stormtrooper::Stormtrooper()
 {
 	this->id = nullptr;
@@ -45,73 +90,34 @@ Stormtrooper::Stormtrooper()
 
 Stormtrooper::Stormtrooper(const char* _id, const StormtrooperRank _rank, const char* _type, const Planet& _planet)
 {
-	this->id = new char[strlen(_id) + 1];
-	strcpy_s(this->id, (strlen(_id) + 1), _id);
-
+	copyId(_id);
 	this->rank = _rank;
-
-	this->type = new char[strlen(_type) + 1];
-	strcpy_s(this->type, (strlen(_type) + 1), _type);
-
+	copyType(_type);
 	this->planet = _planet;
 
 }
 
 Stormtrooper::Stormtrooper(const Stormtrooper& entity)
 {
-	int size = 0;
-
-	size = strlen(entity.id) + 1;
-	this->id = new char[size];
-	strcpy_s(this->id, size, entity.id);
-	size = 0;
-
-	this->rank = entity.rank;
-
-	size = strlen(entity.type) + 1;
-	this->type = new char[size];
-	strcpy_s(this->type, size, entity.type);
-	size = 0;
-
-
-	this->planet = entity.planet;
-
+	copy(entity);
 }
 
+Stormtrooper::~Stormtrooper()
+{
+	clear();
+}
+
+
+//Operators
 Stormtrooper& Stormtrooper::operator=(const Stormtrooper& entity)
 {
 	if (this != &entity)
 	{
-		delete[] id;
+		clear();
 		this->rank = StormtrooperRank::Undefine;
-		delete[] type;
-		planet.~Planet();
+		//planet.~Planet();
 
-		if (entity.get_id() != nullptr)
-		{
-			this->id = new char[strlen(entity.id) + 1];
-			strcpy_s(this->id, (strlen(entity.id) + 1), entity.id);
-		}
-		else
-		{
-			this->id = nullptr;
-		}
-
-		this->rank = entity.rank;
-
-		if (entity.get_type() != nullptr)
-		{
-			this->type = new char[strlen(entity.type) + 1];
-			strcpy_s(this->type, (strlen(entity.type) + 1), entity.type);
-		}
-		else
-		{
-			this->type = nullptr;
-		}
-		
-
-		this->planet = entity.planet;
-
+		copy(entity);
 	}
 
 	return *this;
@@ -119,7 +125,10 @@ Stormtrooper& Stormtrooper::operator=(const Stormtrooper& entity)
 
 bool Stormtrooper::operator==(const Stormtrooper& entity) const
 {
-	return strcmp(this->get_id(), entity.get_id()) && this->get_rank() == entity.get_rank() && strcmp(this->get_type(), entity.get_type()) && this->planet == entity.planet;
+	return !strcmp(this->get_id(), entity.get_id()) 
+		&& this->get_rank() == entity.get_rank() 
+		&& !strcmp(this->get_type(), entity.get_type()) 
+		&& this->planet == entity.planet;
 }
 
 bool Stormtrooper::operator!=(const Stormtrooper& entity) const
@@ -127,11 +136,9 @@ bool Stormtrooper::operator!=(const Stormtrooper& entity) const
 	return !(*this == entity);
 }
 
-std::ostream& operator<<(std::ostream& out, const Stormtrooper entity)
+std::ostream& operator<<(std::ostream& out, const Stormtrooper& entity)
 {
-	out << "Stormtrooper" << std::endl;
-	out << "Id: " << entity.get_id() << std::endl;
-	out << "Rank: ";
+	out << entity.get_id() << std::endl;
 
 	switch (entity.get_rank())
 	{
@@ -144,8 +151,10 @@ std::ostream& operator<<(std::ostream& out, const Stormtrooper entity)
 	default: out << "Undefine!" << std::endl; break;
 	}
 
-	out << "Type: " << entity.get_type() << std::endl;
-	out << "Planet: " << entity.planet.get_name() << std::endl;
+	out << entity.get_type() << std::endl;
+	out << entity.planet;
+	out << std::endl;
+
 	return out;
 }
 
@@ -153,15 +162,15 @@ std::istream& operator>>(std::istream& in, Stormtrooper& entity)
 {
 	char* temp = new char[100];
 
-	std::cout << "Enter data: " << std::endl;
-	std::cout << "Id: ";
+
+	//std::cout << "Id: ";
 	in.getline(temp, 100);
 	entity.set_id(temp);
 	delete[] temp;
 	temp = nullptr;
 
-	///to do...
-	std::cout << "Rank: ";
+
+	//std::cout << "Rank: ";
 	temp = new char[100];
 	in.getline(temp, 100);
 	StormtrooperRank rank = stormtrooperRankType(temp);
@@ -171,20 +180,16 @@ std::istream& operator>>(std::istream& in, Stormtrooper& entity)
 
 
 	temp = new char[100];
-	std::cout << "Type: ";
+	//std::cout << "Type: ";
 	in.getline(temp, 100);
 	entity.set_type(temp);
 	delete[] temp;
 	temp = nullptr;
 	
-	temp = new char[100];
-	std::cout << "Planet name: ";
-	in.getline(temp, 100);
 
+	//std::cout << "Planet: ";
 	Planet _planet = Planet();
-	_planet.set_name(temp);
-	
-
+	in >> _planet;
 	entity.set_planet(_planet);
 	delete[] temp;
 	temp = nullptr;
@@ -192,10 +197,4 @@ std::istream& operator>>(std::istream& in, Stormtrooper& entity)
 	return in;
 }
 
-Stormtrooper::~Stormtrooper()
-{
-	delete[] id;
-	id = nullptr;
-	delete[] type;
-	type = nullptr;
-}
+
